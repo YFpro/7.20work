@@ -10,8 +10,9 @@ opts  json   选项
       btnActive  String  获得焦点的按钮颜色
 
 */
-function wheel(wins,opts,runOpts ){
+function wheel(wins,opts,runOpts){
     var wins=document.querySelector(wins);
+    var win=wins;
     if(!(wins&&wins.nodeType==1)){
         console.error("无窗口元素");
         return;
@@ -19,14 +20,14 @@ function wheel(wins,opts,runOpts ){
      opts.imgs.push(opts.imgs[0]);
      opts.links.push(opts.links[0]);
      opts.imgColor.push(opts.imgColor[0]);
-    var imgLength=opts.imgs.length;
-          if( imgLength==0){
+    var imgLength = opts.imgs.length;
+          if(imgLength==0){
           console.error("没有传入相应的轮播内容");
           return;
           }
     var imgSize=opts.imgSize;
          if(!(imgSize instanceof Array)){
-         console.log("请传入合法尺寸");
+         console.error("请传入合法尺寸");
          }
         if(imgSize.length==0){
          imgSize[0]=document.documentElement.clientWidth;
@@ -42,7 +43,7 @@ function wheel(wins,opts,runOpts ){
             }
         }
 var btnColor=opts.btnColor||"green";
-var btnActive=opts.btnColor||"red";
+var btnActive=opts.btnActive||"red";
 var btnPos=opts.btnPos||["center" ,"20"]
 var runOpts=runOpts||{};
 var time=0;
@@ -52,7 +53,7 @@ time=runOpts.time*1000;
 time=5000;
 }
 var eachTime=0;
-if(runOpts.time){
+if(runOpts.eachTime){
     eachTime=runOpts.eachTime*1000;
     }else {
     eachTime=500;
@@ -65,44 +66,38 @@ if(runOpts.runStyle=="linner"||!(runOpts.runStyle)){
 }else if(runOpts.runStyle=="out"){
          runStyle=Tween.Quad.easeOut;
 }
-
+console.log(runStyle);
 //创建html结构样式
-wins.style.cssText="width:100%;height:"+imgSize[1]+"px;overflow:hidden;position:relative;"
-var box=document.createElement( "div");
+wins.style.cssText="width:100%;height:"+imgSize[1]+"px;position:relative;";
+var box=document.createElement("div");
 box.style.cssText="width:"+imgLength*100+"%;height:100%;border:1px solid red;"
 wins.appendChild(box);
-
 //构建轮播图
 for(var i=0;i<imgLength;i++){
 var divList=document.createElement("div");
-divList.style.cssText=`float:left;width:${100/imgLength}%;
-height:100%;border:1px solid blue; background:${opts.imgColor
-[0]}`;
+divList.style.cssText=`float:left;width:${100/imgLength}%;height:100%;background:${opts.imgColor
+[i]}`;
 var link=document.createElement("a");
 link.href=opts.links[i];
 console.log(imgSize);
-link.style.cssText="width: "+imgSize[0]+"px;height: "+imgSize[1]
-+"px;display: block;margin:auto;background:url("+opts.imgst2
-+")no-repeat 0 0"
+link.style.cssText="width:" + imgSize[0] + "px;height:"+imgSize[1]+"px;display: block;margin:auto;background:url("+opts.imgs[i]+")no-repeat 0 0"
 divList.appendChild(link);
 box.appendChild(divList);
 }
 //构建按钮
-var btnBox=document.createElement( "div");
+var btnBox=document.createElement("div");
 btnBox.style.cssText="width:300px;height:20px;position:absolute;left:0;right:0;margin:auto;bottom:"+btnPos[1]+"px";
 var btns=[];
 for(var i=0;i<imgLength-1;i++){
-var bgcolor=i==0?btnActive:btnColor;
+var bgcolor = i == 0 ? btnActive : btnColor;
 console.log(bgcolor);
-var btn=document.createElement( "div");
-btn.style.cssText="width:20px;height : 20px;background:"+bgcolor+";border-radius:50%;margin:0 10px;cursor:pointer;float:left";
+var btn=document.createElement("div");
+btn.style.cssText="width:20px;height:20px;background:"+bgcolor+";border-radius:50%;margin:0 10px;cursor:pointer;float:left";
 btnBox.appendChild(btn);
+btns.push(btn);
 }
 wins.appendChild(btnBox);
 //开始轮播
-var wins=document.getElementsByClassName("window")[0];
-var box=document.getElementsByClassName("box")[0];
-var btns=document.querySelectorAll(".btns li");
 var winW=parseInt(getComputedStyle(wins,null).width);
 var num = 0;
 function move(){
@@ -123,7 +118,7 @@ function move(){
     for(var i=0;i<btns.length;i++){
     btns[i].style.background=btnColor;
        }
-   btns[num].style.background=btnColor;
+   btns[num].style.background=btnActive;
    
 }
 
@@ -139,7 +134,7 @@ var t =setInterval(move,time);
     btns[j].style.background = btnColor;
       }
         btns[num].style.background =btnActive;
-}
+    }
 }
 
     wins.onmouseover=function(){

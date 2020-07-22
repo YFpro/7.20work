@@ -9,14 +9,14 @@ this.clickRun();
 }
 wheel.prototype={
      init(wins,opts,runOpts){
-         var wins=document.querySelector(wins);
+        this.runOpts=runOpts;
+        this.opts=opts;
+        this.wins=wins;
+        var wins=document.querySelector(wins);
         if(!(wins&&wins.nodeType==1)){
             console.error("无窗口元素");
             return;
         }
-        this.runOpts=runOpts;
-        this.opts=opts;
-        this.wins=wins;
          opts.imgs.push(opts.imgs[0]);
          opts.links.push(opts.links[0]);
          opts.imgColor.push(opts.imgColor[0]);
@@ -66,7 +66,8 @@ wheel.prototype={
     }else if(runOpts.runStyle=="out"){
         this.runStyle=Tween.Quad.easeOut;
     }
-     },
+
+},
      getWin(){
         this.wins.style.cssText="width:100%;height:"+this.imgSize[1]+"px;overflow:hidden;position:relative;"
      },
@@ -104,57 +105,61 @@ wheel.prototype={
         }
         this.wins.appendChild(btnBox);
      },
-     autoRun(){
-        var wins=document.getElementsByClassName("window")[0];
-        var box=document.getElementsByClassName("box")[0];
-        var btns=document.querySelectorAll(".btns li");
-        var winW=parseInt(getComputedStyle(wins,null).width);
-        var num = 0;
-        function move(){
-           num++;
-           if (num>btns.length-1){
-               animate(box,{
-                  "margin-left":-num*winW
-              },this.eachTime,this.runStyle,function(){
-                  box.style.marginLeft=0;
-              })
-               num=0;    
-          } else{
-              animate(box,{
-                  "margin-left":-num*winW
-           },this.eachTime,this.runStyle)
-        }
-        
-            for(var i=0;i<btns.length;i++){
-            btns[i].style.background=btnColor;
-               }
-           btns[num].style.background=btnColor;
-           
-        },
-       
-        },
-     clickRun(){
-            var t =setInterval(move,time);
-            for (let i = 0; i< this.btns.length; i++){
-    btns[i].onclick = function (){
-     num = i;
-     animate(box,{
-    "margin-left":-num*winW
-},eachTime,runStyle)
-   for (var j = 0; j< btns.length; j++){
-    btns[j].style.background = btnColor;
-      }
-        btns[num].style.background =btnActive;
-}
-}
-
-    wins.onmouseover=function(){
-      clearInterval(t);
- }
-    wins.onmouseout=function(){
-    t= setInterval(move,3000);
-    }
-}
+     _setVal(){
+        this._winW=parseInt(getComputedStyle(this.wins,null).width);
+        this._num = 0;
+        this.t=0;
+     },
+     _move(){
+         var that=this;
+         return function(){
+        this._num++;
+        if ( that._num>that.btns.length-1){
+            animate(that.box,{
+               "margin-left":-that._num*that._winW
+           },that.eachTime,that.runStyle,function(){
+               that.box.style.marginLeft=0;
+           })
+           that._num=0;    
+       } else{
+           animate(that.box,{
+               "margin-left":-that._num*that._winW
+        },that.eachTime,that.runStyle)
      }
+     //按钮轮播
+         for(var i=0;i<that.btns.length;i++){
+            that.btns[i].style.background=that.btnColor;
+            }
+            that.btns[num].style.background=that.btnActive;
+        } 
+     
+    },
+     autoRun(){
+        this._setVal();
+        this.t=setInterval(this._move.call(this),this.time);
+     },   
+     clickRun(){ 
+    var that=this;  
+    for (let i = 0; i< this.btns.length; i++){
+    this.btns[i].onclick = function (){
+     this._num = i;
+     animate(that.box,{
+    "margin-left":-num*winW
+     },that.eachTime,that.runStyle)
+   for (var j = 0; j< this.btns.length; j++){
+    this.btns[j].style.background = this.btnColor;
+      }
+      this. btns[num].style.background =this.btnActive;
+}
+}
 
+    this.wins.onmouseover=function(){
+      clearInterval(that.t);
+     }
+    this.wins.onmouseout=function(){
+    this.t= setInterval(move,3000);
+    }
 
+    },
+
+}
